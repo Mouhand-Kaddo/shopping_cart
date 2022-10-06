@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart{% endblock title %}
+
+{% block content %}
+<h1>Products</h1>
+{% for product in products %}
+         <p>{{ product }} {{ product.quantity }}</p>
+         <form action="{% url 'ProductBuy' product.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Buy">
+        </form>
+{% endfor %}
+<h1>your cart</h1>
+{% for cart in carts %}
+         <p>{{ cart.product }}</p>
+         <form action="{% url 'ProductDelete' cart.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Delete Product">
+        </form>
+{% endfor %}
+{% endblock content %}
