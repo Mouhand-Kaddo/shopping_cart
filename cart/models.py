@@ -13,18 +13,23 @@ class Product(
         return self.product_name
 
 
-class Cart(models.Model):
+class Cart(
+    models.Model
+):  # Model which represents the Cart object, which has an ID and the data it was created
     cart_id = models.CharField(max_length=250, blank=True)
     date_added = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "Cart"
 
-    def __str__(self):
+    def __str__(self):  # String for representing the Model object
         return self.cart_id
 
 
-class CartProduct(models.Model):
+class CartProduct(
+    models.Model
+):  # Model which represents the Products that are inside a specfic cart, has a foreign key to a cart,
+    # and a foreign key to a product, also stores the price of the product as well as the quantity
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
@@ -38,8 +43,10 @@ class CartProduct(models.Model):
             )
         ]
 
-    def sub_total(self):
+    def sub_total(
+        self,
+    ):  # returns a number that represents the ammount that must be paid
         return self.product.price * self.quantity
 
-    def __str__(self):
+    def __str__(self):  # String for representing the Model object
         return self.product

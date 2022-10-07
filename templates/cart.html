@@ -4,19 +4,55 @@
 
 {% block content %}
 <h1>Products</h1>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Product name</th>
+        <th scope="col">Quantity (kg)</th>
+        <th scope="col">Price (per kg in AED)</th>
+        <th scope="col">Buy</th>
+      </tr>
+    </thead>
+    <tbody>
 {% for product in products %}
-         <p>{{ product }} {{ product.quantity }}</p>
-         <form action="{% url 'ProductBuy' product.pk %}" method="post">
+    <tr>
+        <th scope="row"><p>{{ product }}</p></th>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.price }}</td>
+        <td>
+            <form action="{% url 'ProductBuy' product.pk %}" method="post">
             {% csrf_token %}
-            <input type="submit" value="Buy">
+            <input type="submit" class="btn btn-success" value="Buy Product">
         </form>
+        </td>
+      </tr>
 {% endfor %}
-<h1>your cart</h1>
+    </tbody>
+</table>
+<h1>My cart</h1>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Product name</th>
+        <th scope="col">Quantity (kg)</th>
+        <th scope="col">Price (per kg in AED)</th>
+        <th scope="col">Remove</th>
+      </tr>
+    </thead>
+    <tbody>
 {% for cart in carts %}
-         <p>{{ cart.product }}</p>
-         <form action="{% url 'ProductDelete' cart.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Delete Product">
-        </form>
+        <tr>
+            <th scope="row"><p>{{ cart.product }}</p></th>
+            <td>{{ cart.quantity }}</td>
+            <td>{{ cart.sub_total}}</td>
+            <td>
+                <form action="{% url 'ProductDelete' cart.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-danger" value="Remove Product">
+                </form>
+            </td>
+        </tr>
 {% endfor %}
+    </tbody>
+</table>
 {% endblock content %}
