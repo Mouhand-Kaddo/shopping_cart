@@ -35,7 +35,7 @@
       <tr>
         <th scope="col">Product name</th>
         <th scope="col">Quantity (kg)</th>
-        <th scope="col">Price (per kg in AED)</th>
+        <th scope="col">Price (overall)</th>
         <th scope="col">Remove</th>
       </tr>
     </thead>
@@ -55,4 +55,11 @@
 {% endfor %}
     </tbody>
 </table>
+{% for message in messages %}
+<div class= "container-fluid p-0 fixed-bottom">
+  <div class= "alert {{ message.tags }} text-center" role="alert" >
+    {{ message }}
+  </div>
+</div>
+{% endfor %}
 {% endblock content %}

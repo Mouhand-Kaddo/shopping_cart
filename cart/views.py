@@ -1,5 +1,4 @@
-from gettext import Catalog
-from unicodedata import name
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Cart, CartProduct, Product
@@ -17,13 +16,17 @@ def _card_id(request):  # A function that gets the current session key and retur
 def CartAndProductView(
     request,
 ):  # A fucntion that creates the view for the cart.html page
-    try:  # tries to get a cart with a cart ID that matches the current session key
+    # tries to get a cart with a cart ID that matches the current session key
+    try:
         cart = Cart.objects.get(cart_id=_card_id(request))
-    except Cart.DoesNotExist:  # if no cart was found then create a cart with the session key as ID
-        cart = Cart.objects.create(cart_id=_card_id(request))
 
+    # if no cart was found then create a cart with the session key as ID
+    except Cart.DoesNotExist:  
+        cart = Cart.objects.create(cart_id=_card_id(request))
         cart.save()
-    # get the carts products and the overall products
+
+
+    # get the carts products and the overall products and then render the page
     cart_product = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
     context = {
@@ -49,15 +52,34 @@ def ProductBuy(request, pk):
                 product.quantity -= 1
                 product.save()
                 cart_product.save()
+                messages.success(
+                    request,
+                    f"1 kg of {product.product_name} has been added to your cart",
+                )
+            else:
+                messages.error(
+                    request,
+                    f"I'm sorry but we are out of stock for {product.product_name}",
+                )
         except CartProduct.DoesNotExist:
-            cart_item = CartProduct.objects.create(
-                product=product,
-                quantity=1,
-                cart=cart,
-            )
-            product.quantity -= 1
-            product.save()
-            cart_item.save()
+            if product.quantity != 0:
+                cart_item = CartProduct.objects.create(
+                    product=product,
+                    quantity=1,
+                    cart=cart,
+                )
+                product.quantity -= 1
+                product.save()
+                cart_item.save()
+                messages.success(
+                    request,
+                    f"1 kg of {product.product_name} has been added to your cart",
+                )
+            else:
+                messages.error(
+                    request,
+                    f"I'm sorry but we are out of stock for {product.product_name}",
+                )
         return redirect("/")
     return render(request, "cart.html")
 
@@ -70,10 +92,18 @@ def ProductDelete(request, pk):
             Catalog.quantity += 1
             Catalog.save()
             cart_item.delete()
+            messages.success(
+                request,
+                f"{cart_item.product} have been removed from your cart",
+            )
         else:
             Catalog.quantity += 1
             cart_item.quantity -= 1
             Catalog.save()
             cart_item.save()
+            messages.success(
+                request,
+                f"1 kg of {cart_item.product} has been removed from your cart",
+            )
         return redirect("/")
     return render(request, "cart.html", {"product": cart_item})
