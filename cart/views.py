@@ -56,54 +56,60 @@ def CartAndProductView(
 
 
 def ProductBuy(request, pk):
-    amount = float(request.POST.get("amount"))
-    product = Product.objects.get(pk=pk)
-    if request.method == "POST":
-        try:
-            cart = Cart.objects.get(cart_id=_card_id(request))
-        except Cart.DoesNotExist:
-            cart = Cart.objects.create(cart_id=_card_id(request))
+    try:
+        cart = Cart.objects.get(cart_id=_card_id(request))
+    except Cart.DoesNotExist:
+        cart = Cart.objects.create(cart_id=_card_id(request))
         cart.save()
-        try:
-            cart_product = CartProduct.objects.get(product=product, cart=cart)
-            if amount == 0:
-                messages.error(
-                    request,
-                    f"please enter an amount that is above 0",
-                )
-            elif product.quantity >= amount:
-                cart_product.quantity += amount
-                product.quantity -= amount
-                product.save()
-                cart_product.save()
-                messages.success(
-                    request,
-                    f"{amount} kg of {product.product_name} has been added to your cart",
-                )
-            else:
-                messages.error(
-                    request,
-                    f"I'm sorry but we are out of stock for {product.product_name}",
-                )
-        except CartProduct.DoesNotExist:
-            if product.quantity >= amount:
-                cart_item = CartProduct.objects.create(
-                    product=product,
-                    quantity=amount,
-                    cart=cart,
-                )
-                product.quantity -= amount
-                product.save()
-                cart_item.save()
-                messages.success(
-                    request,
-                    f"{amount} kg of {product.product_name} has been added to your cart",
-                )
-            else:
-                messages.error(
-                    request,
-                    f"I'm sorry but we are out of stock for {product.product_name}",
-                )
+    if request.POST.get("amount") == "":
+        messages.error(
+            request,
+            f"please enter an amount",
+        )
+    else:
+        amount = float(request.POST.get("amount"))
+        product = Product.objects.get(pk=pk)
+        if request.method == "POST":
+            try:
+                cart_product = CartProduct.objects.get(product=product, cart=cart)
+                if amount == 0:
+                    messages.error(
+                        request,
+                        f"please enter an amount that is above 0",
+                    )
+                elif product.quantity >= amount:
+                    cart_product.quantity += amount
+                    product.quantity -= amount
+                    product.save()
+                    cart_product.save()
+                    messages.success(
+                        request,
+                        f"{amount} kg of {product.product_name} has been added to your cart",
+                    )
+                else:
+                    messages.error(
+                        request,
+                        f"I'm sorry but we are out of stock for {product.product_name}",
+                    )
+            except CartProduct.DoesNotExist:
+                if product.quantity >= amount:
+                    cart_item = CartProduct.objects.create(
+                        product=product,
+                        quantity=amount,
+                        cart=cart,
+                    )
+                    product.quantity -= amount
+                    product.save()
+                    cart_item.save()
+                    messages.success(
+                        request,
+                        f"{amount} kg of {product.product_name} has been added to your cart",
+                    )
+                else:
+                    messages.error(
+                        request,
+                        f"I'm sorry but we are out of stock for {product.product_name}",
+                    )
     cart_product = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
     context = {
@@ -114,37 +120,43 @@ def ProductBuy(request, pk):
 
 
 def ProductDelete(request, pk):
-    amount = float(request.POST.get("removeamount"))
-    cart_item = get_object_or_404(CartProduct, pk=pk)
-    Catalog = Product.objects.get(product_name=cart_item.product)
-    if request.method == "POST":
-        if amount == 0:
-            messages.error(
-                request,
-                f"please enter an amount that is above 0",
-            )
-        elif cart_item.quantity == amount:
-            Catalog.quantity += amount
-            Catalog.save()
-            cart_item.delete()
-            messages.success(
-                request,
-                f"{cart_item.product} have been removed from your cart",
-            )
-        elif cart_item.quantity > amount:
-            Catalog.quantity += amount
-            cart_item.quantity -= amount
-            Catalog.save()
-            cart_item.save()
-            messages.success(
-                request,
-                f"{amount} kg of {cart_item.product} has been removed from your cart",
-            )
-        else:
-            messages.error(
-                request,
-                f"couldn't remove {amount} kg from {cart_item.product} because you only hold {cart_item.quantity} kg",
-            )
+    if request.POST.get("removeamount") == "":
+        messages.error(
+            request,
+            f"please enter an amount",
+        )
+    else:
+        amount = float(request.POST.get("removeamount"))
+        cart_item = get_object_or_404(CartProduct, pk=pk)
+        Catalog = Product.objects.get(product_name=cart_item.product)
+        if request.method == "POST":
+            if amount == 0:
+                messages.error(
+                    request,
+                    f"please enter an amount that is above 0",
+                )
+            elif cart_item.quantity == amount:
+                Catalog.quantity += amount
+                Catalog.save()
+                cart_item.delete()
+                messages.success(
+                    request,
+                    f"{cart_item.product} have been removed from your cart",
+                )
+            elif cart_item.quantity > amount:
+                Catalog.quantity += amount
+                cart_item.quantity -= amount
+                Catalog.save()
+                cart_item.save()
+                messages.success(
+                    request,
+                    f"{amount} kg of {cart_item.product} has been removed from your cart",
+                )
+            else:
+                messages.error(
+                    request,
+                    f"couldn't remove {amount} kg from {cart_item.product} because you only hold {cart_item.quantity} kg",
+                )
     try:
         cart = Cart.objects.get(cart_id=_card_id(request))
     except Cart.DoesNotExist:
