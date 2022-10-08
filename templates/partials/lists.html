@@ -37,13 +37,13 @@
       </tr>
     </thead>
     <tbody>
-{% for cart in carts %}
+{% for carts_product in carts_products %}
         <tr>
-            <th scope="row"><p>{{ cart.product }}</p></th>
-            <td>{{ cart.quantity }}</td>
-            <td>{{ cart.sub_total}}</td>
+            <th scope="row"><p>{{ carts_product.product }}</p></th>
+            <td>{{ carts_product.quantity }}</td>
+            <td>{{ carts_product.sub_total}}</td>
             <td>
-              <form hx-post="{% url 'ProductDelete' cart.id %}" hx-target='#lists' class="d-flex align-items-center">
+              <form hx-post="{% url 'ProductDelete' carts_product.id %}" hx-target='#lists' class="d-flex align-items-center">
                 {% csrf_token %}
                 <input type="number" step= "0.1" min = "0" max ="99" onkeypress="return isNumberKey(event)" name="removeamount"  class="form-control-sm mr-2" placeholder="Enter amount by kg" />
                 <button type="submit" class="btn btn-danger btn-sm"> Remove</button>
@@ -52,6 +52,12 @@
         </tr>
 {% endfor %}
     </tbody>
+    <tfoot>
+      <th scope="row"><p>your subtotal is {{cart.total}} AED</p></th>
+      <td></td>
+      <td></td>
+      <td>buy item</td>
+    </tfoot>
 </table>
 
 {% for message in messages %}

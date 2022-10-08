@@ -13,6 +13,13 @@ def _card_id(request):  # A function that gets the current session key and retur
     return cart
 
 
+def total(cart_products, cart):
+    cart.total = 0
+    for cart_product in cart_products:
+        cart.total = cart.total + cart_product.sub_total()
+    cart.save()
+
+
 def CartAndProductView(
     request,
 ):  # A fucntion that creates the view for the cart.html page
@@ -46,12 +53,10 @@ def CartAndProductView(
         cart.save()
 
     # get the carts products and the overall products and then render the page
-    cart_product = CartProduct.objects.filter(cart=cart)
+    cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    context = {
-        "products": products,
-        "carts": cart_product,
-    }
+    total(cart_products, cart)
+    context = {"products": products, "carts_products": cart_products, "cart": cart}
     return render(request, "cart.html", context)
 
 
@@ -110,12 +115,10 @@ def ProductBuy(request, pk):
                         request,
                         f"I'm sorry but we are out of stock for {product.product_name}",
                     )
-    cart_product = CartProduct.objects.filter(cart=cart)
+    cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    context = {
-        "products": products,
-        "carts": cart_product,
-    }
+    total(cart_products, cart)
+    context = {"products": products, "carts_products": cart_products, "cart": cart}
     return render(request, "partials/lists.html", context)
 
 
@@ -162,10 +165,8 @@ def ProductDelete(request, pk):
     except Cart.DoesNotExist:
         cart = Cart.objects.create(cart_id=_card_id(request))
         cart.save()
-    cart_product = CartProduct.objects.filter(cart=cart)
+    cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    context = {
-        "products": products,
-        "carts": cart_product,
-    }
+    total(cart_products, cart)
+    context = {"products": products, "carts_products": cart_products, "cart": cart}
     return render(request, "partials/lists.html", context)
