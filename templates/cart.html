@@ -3,63 +3,9 @@
 {% block title %}Shopping Cart{% endblock title %}
 
 {% block content %}
-<h1>Products</h1>
-<table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Product name</th>
-        <th scope="col">Quantity (kg)</th>
-        <th scope="col">Price (per kg in AED)</th>
-        <th scope="col">Buy</th>
-      </tr>
-    </thead>
-    <tbody>
-{% for product in products %}
-    <tr>
-        <th scope="row"><p>{{ product }}</p></th>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.price }}</td>
-        <td>
-            <form action="{% url 'ProductBuy' product.pk %}" method="post">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-success" value="Buy Product">
-        </form>
-        </td>
-      </tr>
-{% endfor %}
-    </tbody>
-</table>
-<h1>My cart</h1>
-<table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Product name</th>
-        <th scope="col">Quantity (kg)</th>
-        <th scope="col">Price (overall)</th>
-        <th scope="col">Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-{% for cart in carts %}
-        <tr>
-            <th scope="row"><p>{{ cart.product }}</p></th>
-            <td>{{ cart.quantity }}</td>
-            <td>{{ cart.sub_total}}</td>
-            <td>
-                <form action="{% url 'ProductDelete' cart.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Remove Product">
-                </form>
-            </td>
-        </tr>
-{% endfor %}
-    </tbody>
-</table>
-{% for message in messages %}
-<div class= "container-fluid p-0 fixed-bottom">
-  <div class= "alert {{ message.tags }} text-center" role="alert" >
-    {{ message }}
-  </div>
+
+<div id = "lists">
+    {% include 'partials/lists.html' %}
 </div>
-{% endfor %}
+
 {% endblock content %}

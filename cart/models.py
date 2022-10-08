@@ -49,4 +49,4 @@ class CartProduct(
         return self.product.price * self.quantity
 
     def __str__(self):  # String for representing the Model object
-        return self.product
+        return self.product.product_name

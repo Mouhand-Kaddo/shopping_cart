@@ -1,0 +1,63 @@
+<h1>Products</h1>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Product name</th>
+        <th scope="col">Quantity (kg)</th>
+        <th scope="col">Price (per kg in AED)</th>
+        <th scope="col">Buy</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for product in products %}
+    <tr>
+        <th scope="row"><p>{{ product }}</p></th>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.price }}</td>
+        <td>
+            <form hx-post="{% url 'ProductBuy' product.pk %}" hx-target='#lists' class="d-flex align-items-center">
+                {% csrf_token %}
+                <input type="number" step= "0.1" min = "0" max ="99" onkeypress="return isNumberKey(event)" name="amount"  class="form-control-sm mr-2" placeholder="Enter amount by kg" />
+                <button type="submit" class="btn btn-success btn-sm"> Buy</button>
+            </form>
+        </td>
+      </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+<h1>My cart</h1>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Product name</th>
+        <th scope="col">Quantity (kg)</th>
+        <th scope="col">Price (overall)</th>
+        <th scope="col">Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for cart in carts %}
+        <tr>
+            <th scope="row"><p>{{ cart.product }}</p></th>
+            <td>{{ cart.quantity }}</td>
+            <td>{{ cart.sub_total}}</td>
+            <td>
+              <form hx-post="{% url 'ProductDelete' cart.id %}" hx-target='#lists' class="d-flex align-items-center">
+                {% csrf_token %}
+                <input type="number" step= "0.1" min = "0" max ="99" onkeypress="return isNumberKey(event)" name="removeamount"  class="form-control-sm mr-2" placeholder="Enter amount by kg" />
+                <button type="submit" class="btn btn-danger btn-sm"> Remove</button>
+              </form>
+            </td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% for message in messages %}
+<div class= "container-fluid p-0 fixed-bottom">
+  <div class= "alert {{ message.tags }} text-center" role="alert" >
+    {{ message }}
+  </div>
+</div>
+{% endfor %}
