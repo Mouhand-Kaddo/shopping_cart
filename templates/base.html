@@ -29,6 +29,7 @@
     </main>
   </div>
 
+  <!-- JavaScript that allows the page to dynamically generate csrf_token to the needed request instead of specifying which request needs a token-->
   <script>
     document.body.addEventListener('htmx:configRequest', (event) => {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
@@ -40,9 +41,10 @@
   <!-- Bootstrap JavaScript Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
-  <!-- htmx cdn -->
+  <!-- htmx Bundle -->
   <script src="https://unpkg.com/htmx.org@1.8.0" integrity="sha384-cZuAZ+ZbwkNRnrKi05G/fjBX+azI9DNOkNYysZ0I/X5ZFgsmMiBXgDZof30F5ofc" crossorigin="anonymous"></script>
 
+  <!-- JavaScript that blocks the entry of any text that isnt a number-->
   <script>
     function isNumberKey(evt){
       var charCode = (evt.which) ? evt.which : evt.keyCode
