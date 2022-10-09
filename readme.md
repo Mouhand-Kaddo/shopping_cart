@@ -26,7 +26,7 @@ python -m venv .venv
 ```
 pip install -r requirements.txt
 ```
-- now to run the webapp using the following command
+- now run the webapp using the following command
 ```
 python manage.py runserver
 ```
