@@ -15,7 +15,6 @@ class Product(models.Model):
 # Model which represents the Cart object, which has an ID, the data it was created, and the total price of the cart
 class Cart(models.Model):
     cart_id = models.CharField(max_length=250, blank=True)
-    date_added = models.DateField(auto_now_add=True)
     total = models.FloatField(default=0)
 
     class Meta:
