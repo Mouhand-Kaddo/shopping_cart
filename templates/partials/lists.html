@@ -16,7 +16,6 @@
         <td>{{ product.price }}</td>
         <td>
             <form hx-post="{% url 'ProductBuy' product.pk %}" hx-target='#lists' class="d-flex align-items-center">
-                {% csrf_token %}
                 <input type="number" step= "0.1" min = "0" max ="99" onkeypress="return isNumberKey(event)" name="amount"  class="form-control-sm mr-2" placeholder="Enter amount by kg" />
                 <button type="submit" class="btn btn-success btn-sm"> Buy</button>
             </form>
@@ -44,7 +43,6 @@
             <td>{{ carts_product.sub_total}}</td>
             <td>
               <form hx-post="{% url 'ProductDelete' carts_product.id %}" hx-target='#lists' class="d-flex align-items-center">
-                {% csrf_token %}
                 <input type="number" step= "0.1" min = "0" max ="99" onkeypress="return isNumberKey(event)" name="removeamount"  class="form-control-sm mr-2" placeholder="Enter amount by kg" />
                 <button type="submit" class="btn btn-danger btn-sm"> Remove</button>
               </form>
@@ -56,7 +54,15 @@
       <th scope="row"><p>your subtotal is {{cart.total}} AED</p></th>
       <td></td>
       <td></td>
-      <td>buy item</td>
+      <td>
+          <form 
+          hx-delete="{% url 'CartBuy' cart.cart_id %}"
+          hx-target='#lists' 
+          hx-confirm="Are you sure you wish to buy these products?" 
+          class="d-flex align-items-center">
+          <button type="submit" class="btn btn-success">Buy cart</button>
+        </form>
+      </td>
     </tfoot>
 </table>
 

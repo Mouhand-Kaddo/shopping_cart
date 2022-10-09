@@ -1,3 +1,5 @@
+from ast import Delete
+import re
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -13,7 +15,7 @@ def _card_id(request):  # A function that gets the current session key and retur
     return cart
 
 
-def total(cart_products, cart):
+def _total(cart_products, cart):
     cart.total = 0
     for cart_product in cart_products:
         cart.total = cart.total + cart_product.sub_total()
@@ -55,7 +57,7 @@ def CartAndProductView(
     # get the carts products and the overall products and then render the page
     cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    total(cart_products, cart)
+    _total(cart_products, cart)
     context = {"products": products, "carts_products": cart_products, "cart": cart}
     return render(request, "cart.html", context)
 
@@ -94,7 +96,7 @@ def ProductBuy(request, pk):
                 else:
                     messages.error(
                         request,
-                        f"I'm sorry but we are out of stock for {product.product_name}",
+                        f"I'm sorry but we only have {product.quantity} of {product.product_name} which isnt enough to fulfill your request of {amount}",
                     )
             except CartProduct.DoesNotExist:
                 if product.quantity >= amount:
@@ -113,11 +115,11 @@ def ProductBuy(request, pk):
                 else:
                     messages.error(
                         request,
-                        f"I'm sorry but we are out of stock for {product.product_name}",
+                        f"I'm sorry but we only have {product.quantity} kg of {product.product_name} which isnt enough to fulfill your request of {amount} kg",
                     )
     cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    total(cart_products, cart)
+    _total(cart_products, cart)
     context = {"products": products, "carts_products": cart_products, "cart": cart}
     return render(request, "partials/lists.html", context)
 
@@ -167,6 +169,28 @@ def ProductDelete(request, pk):
         cart.save()
     cart_products = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
-    total(cart_products, cart)
+    _total(cart_products, cart)
     context = {"products": products, "carts_products": cart_products, "cart": cart}
+    return render(request, "partials/lists.html", context)
+
+
+def CartBuy(request, cart_id):
+    cart = Cart.objects.get(cart_id=cart_id)
+    cart_products = CartProduct.objects.filter(cart=cart)
+    if not cart_products:
+        messages.error(
+            request,
+            f"please select a product to buy",
+        )
+    else:
+        for cart_product in cart_products:
+            cart_product.delete()
+        cart.total = 0
+        messages.success(
+            request,
+            f"your cart has been purchased successfully",
+        )
+    cart_product = CartProduct.objects.filter(cart=cart)
+    products = Product.objects.all()
+    context = {"products": products, "carts_products": cart_product, "cart": cart}
     return render(request, "partials/lists.html", context)
