@@ -1,5 +1,5 @@
 # shopping_cart
-python 3.10.7 and django 4.0.8 was used to make this project 
+python 3.10.7 and django 4.1.2 was used to make this project 
 
 ## About The Project
 
