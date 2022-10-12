@@ -101,7 +101,7 @@ def ProductBuy(request, pk):
                 else:
                     messages.error(
                         request,
-                        f"I'm sorry but we only have {product.quantity} of {product.product_name} which isnt enough to fulfill your request of {amount}",
+                        f"I'm sorry but we only have {product.quantity} kg of {product.product_name} which isnt enough to fulfill your request of {amount} kg",
                     )
 
             # expect that this is the first time the user adds the product to their cart
