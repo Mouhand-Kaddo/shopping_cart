@@ -1,6 +1,4 @@
 from datetime import datetime
-from email.policy import default
-from unicodedata import name
 from django.db import models
 
 # Model which represents the product object, which has a name, a quantity,and a price
@@ -14,7 +12,7 @@ class Product(models.Model):
         return self.product_name
 
 
-# Model which represents the Cart object, which has an ID, the data it was created, and the total price of the cart
+# Model which represents the Cart object, which has an ID,  and the total price of the cart
 class Cart(models.Model):
     cart_id = models.CharField(max_length=250, blank=True)
     total = models.FloatField(default=0)
@@ -53,9 +51,11 @@ class CartProduct(models.Model):
         return self.product.product_name
 
 
+# Model which represents the OrdersPerformed object, which has an the cart as a Foreign Key and the date it was created
 class OrdersPerformed(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    orderdate = models.DateTimeField(default=datetime.now())
+    total = models.FloatField(default=0)
+    orderdate = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "OrdersPerformed"
@@ -65,6 +65,8 @@ class OrdersPerformed(models.Model):
         return str(self.pk)
 
 
+# Model which represents the Products that are inside a specfic order, has a foreign key to a order,
+# and a foreign key to a product, also stores the quantity of the product
 class OrdersItem(models.Model):
     order = models.ForeignKey(OrdersPerformed, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -86,4 +88,4 @@ class OrdersItem(models.Model):
 
     # String for representing the Model object
     def __str__(self):
-        return self.product.product_name
+        return str(self.order.pk)

@@ -1,6 +1,6 @@
+from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
-from random import randint
 
 from .models import Cart, CartProduct, Product, OrdersPerformed, OrdersItem
 
@@ -203,9 +203,6 @@ def CartBuy(request):
     cart = _getOrCreateCart(request)
     products = Product.objects.all()
     cart_products = CartProduct.objects.filter(cart=cart)
-    order = OrdersPerformed.objects.create(
-        cart=cart,
-    )
 
     # if there is not products inside there cart then return an error msg
     if not cart_products:
@@ -214,8 +211,12 @@ def CartBuy(request):
             f"please select a product to buy",
         )
 
-    # else delete the cart product and return a success msg
+    # else create a new order, save the products in cart product to order items, then delete the cart product,
+    # assign the total from the cart to the total of the order and return a success msg
     else:
+        order = OrdersPerformed.objects.create(
+            cart=cart,
+        )
         for cart_product in cart_products:
             order_item = OrdersItem.objects.create(
                 order=order,
@@ -224,13 +225,14 @@ def CartBuy(request):
             )
             order_item.save()
             cart_product.delete()
+        order.total = cart.total
+        order.save()
         cart.total = 0
         cart.save()
         messages.success(
             request,
             f"your cart has been purchased successfully",
         )
-    order.save()
     cart_product = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
     context = {"products": products, "carts_products": cart_product, "cart": cart}
