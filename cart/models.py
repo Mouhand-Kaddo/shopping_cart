@@ -1,3 +1,5 @@
+from datetime import datetime
+from email.policy import default
 from unicodedata import name
 from django.db import models
 
@@ -37,6 +39,42 @@ class CartProduct(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["product", "cart"], name="unique_product_cart"
+            )
+        ]
+
+    # returns a number that represents the ammount that must be paid
+    def sub_total(
+        self,
+    ):
+        return self.product.price * self.quantity
+
+    # String for representing the Model object
+    def __str__(self):
+        return self.product.product_name
+
+
+class OrdersPerformed(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    orderdate = models.DateTimeField(default=datetime.now())
+
+    class Meta:
+        db_table = "OrdersPerformed"
+
+    # String for representing the Model object
+    def __str__(self):
+        return str(self.pk)
+
+
+class OrdersItem(models.Model):
+    order = models.ForeignKey(OrdersPerformed, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.FloatField(default=0)
+
+    class Meta:
+        db_table = "OrdersItem"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "order"], name="unique_product_order"
             )
         ]
 

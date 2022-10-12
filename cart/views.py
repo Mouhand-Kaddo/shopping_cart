@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
+from random import randint
 
-from .models import Cart, CartProduct, Product
+from .models import Cart, CartProduct, Product, OrdersPerformed, OrdersItem
 
 # A function that gets the current session key and returns it
 def _card_id(request):
@@ -200,7 +201,11 @@ def CartBuy(request):
 
     # get the cart and the product inside there cart
     cart = _getOrCreateCart(request)
+    products = Product.objects.all()
     cart_products = CartProduct.objects.filter(cart=cart)
+    order = OrdersPerformed.objects.create(
+        cart=cart,
+    )
 
     # if there is not products inside there cart then return an error msg
     if not cart_products:
@@ -212,6 +217,12 @@ def CartBuy(request):
     # else delete the cart product and return a success msg
     else:
         for cart_product in cart_products:
+            order_item = OrdersItem.objects.create(
+                order=order,
+                product=cart_product.product,
+                quantity=cart_product.quantity,
+            )
+            order_item.save()
             cart_product.delete()
         cart.total = 0
         cart.save()
@@ -219,6 +230,7 @@ def CartBuy(request):
             request,
             f"your cart has been purchased successfully",
         )
+    order.save()
     cart_product = CartProduct.objects.filter(cart=cart)
     products = Product.objects.all()
     context = {"products": products, "carts_products": cart_product, "cart": cart}
